@@ -13,6 +13,7 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.cardview.widget.CardView
 import androidx.leanback.widget.Presenter
+import com.example.myapplication.diy.CustomEditText
 import com.example.myapplication.model.Item
 import com.example.myapplication.model.Subject
 import com.example.myapplication.network.ChenApi
@@ -21,10 +22,10 @@ import kotlinx.coroutines.launch
 
 class SearchPresenter(private val fragment: MainFragment) : Presenter() {
 
-    private lateinit var searchEditText: EditText
+    private lateinit var searchEditText: CustomEditText
     private lateinit var searchButton: TextView
     private lateinit var loadingSpinner: ProgressBar
-    private  lateinit var backgg: Drawable
+    private lateinit var backgg: Drawable
 
     override fun onCreateViewHolder(parent: ViewGroup): ViewHolder {
         val view = LayoutInflater.from(parent.context)
@@ -42,7 +43,8 @@ class SearchPresenter(private val fragment: MainFragment) : Presenter() {
 
         testButton.visibility = View.GONE // 隐藏跳转按钮
 
-
+        searchEditText.isFocusable = true
+        searchEditText.isFocusableInTouchMode = true
         // 按钮可获取焦点
         rsButton.isFocusable = true
         rsButton.isFocusableInTouchMode = true

@@ -98,8 +98,11 @@ class MainFragment : RowsSupportFragment() {
 
         if (json != null) {
             val videoCategories: List<VideoCategory> = Json.decodeFromString(json)
+            // 保存新的数据
+            previousVideoCategories.clear()
             videoCategories.forEach { category ->
                 addVideoRow(category.category, category.videos)
+                previousVideoCategories.add(category)
             }
 
         }

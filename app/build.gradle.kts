@@ -12,8 +12,8 @@ android {
         applicationId = "com.example.myapplication"
         minSdk = 28
         targetSdk = 34
-        versionCode = 102
-        versionName = "1.0.2"
+        versionCode = 103
+        versionName = "1.0.3"
 
     }
 
