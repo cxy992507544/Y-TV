@@ -1,11 +1,13 @@
 package com.example.myapplication
 
 import android.content.Context
+import android.graphics.drawable.Drawable
 import android.util.DisplayMetrics
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.WindowManager
+import android.widget.Button
 import android.widget.TextView
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
@@ -17,6 +19,8 @@ class EpisodeAdapter(
 
     private var episodeList: List<File> = emptyList()
     private var lastSelectedPosition: Int = -1  // 保存最后被点击项的位置
+    private lateinit var backgg: Drawable
+    private var backggisone = true
 
     fun submitList(episodes: List<File>) {
         episodeList = episodes
@@ -51,7 +55,7 @@ class EpisodeAdapter(
 
     inner class EpisodeViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
 
-        private val episodeTextView: TextView = itemView.findViewById(R.id.tvEpisode)
+        private val episodeTextView: Button = itemView.findViewById(R.id.tvEpisode)
 
         init {
             itemView.isFocusable = true // 确保项可聚焦
@@ -77,13 +81,22 @@ class EpisodeAdapter(
             episodeTextView.text = episode.name
             episodeTextView.maxWidth = maxWidth
 
+            if(backggisone){
+                backggisone = false
+                backgg = episodeTextView.background
+            }
+
             // 更新背景颜色和文字颜色
             if (isSelected) {
                 itemView.setBackgroundColor(ContextCompat.getColor(itemView.context, R.color.selected_background))
                 episodeTextView.setTextColor(ContextCompat.getColor(itemView.context, R.color.selected_text))
+//                itemView.setBackgroundColor(android.graphics.Color.argb(100,75,164,164))
+//                episodeTextView.setTextColor(android.graphics.Color.rgb(255,138,0))
             } else {
                 itemView.setBackgroundColor(ContextCompat.getColor(itemView.context, R.color.default_background))
                 episodeTextView.setTextColor(ContextCompat.getColor(itemView.context, R.color.default_text))
+//                episodeTextView.background = backgg
+//                episodeTextView.setTextColor(android.graphics.Color.rgb(0,0,0))
             }
         }
 

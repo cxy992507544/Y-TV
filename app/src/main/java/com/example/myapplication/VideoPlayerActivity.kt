@@ -49,6 +49,10 @@ class VideoPlayerActivity : FragmentActivity() {
         setContentView(layout.activity_video_player)
 
         videoPlayer = findViewById(id.videoPlayer)
+
+        videoPlayer.isFocusable = true
+        videoPlayer.isFocusableInTouchMode = true//允许获取焦点
+
         GSPlayerSystem.setPlayHx(playhx)//设置播放内核
         episodeGridView = findViewById(id.episodeGridView)
         progressBar = findViewById(id.pabrogressBar)
@@ -98,9 +102,10 @@ class VideoPlayerActivity : FragmentActivity() {
                         val d3 = d2?.tasks?.get(0)?.let { it1 -> chen.Getfiles(it1.fileId) }
                         if (d3?.files?.count()!! > 0) {
                             vdlist = d3!!
+                            //--对列表进行排序
+                            vdlist.files.sortBy { it.name }
                             //--干掉那些过于小的文件
-                            // 将 files 转换为 MutableList
-                            val mutableFiles = vdlist.files.toMutableList()
+                            val mutableFiles = vdlist.files
                             // 移除过小的文件
                             for (i in mutableFiles.indices.reversed()) {
                                 if (mutableFiles[i].size.toInt() < 1024 * 1024 * 50) {
@@ -124,11 +129,12 @@ class VideoPlayerActivity : FragmentActivity() {
                         }
                     }
                 }
+
                 //继续实例化播放器等操作
                 if (vdlist.files.isNotEmpty()) {
                     purl = vmlist[0].url.toString()
                     ptitle = "$videoTitle-${vdlist.files[0].name}"
-                    //videoPlayer.setUp(purl, true, "$videoTitle-${vdlist.files[0].name}")
+                    videoPlayer.setUp(purl, true, "$videoTitle-${vdlist.files[0].name}")
                     videoPlayer.titleTextView.visibility = View.GONE
                     videoPlayer.backButton.visibility = View.GONE
                     videoPlayer.fullscreenButton.visibility = View.GONE
@@ -150,8 +156,8 @@ class VideoPlayerActivity : FragmentActivity() {
                         }
                     }
                     // 启动播放器逻辑
-                    //GSPlayerSystem.setEnableHardwareAcceleration(false)
-                    //videoPlayer.startPlayLogic()
+                    GSPlayerSystem.setEnableHardwareAcceleration(true)
+                    videoPlayer.startPlayLogic()
                     videoPlayer.requestFocus() // 确保请求焦点
                     setupEpisodeGridView()
                 } else {
@@ -193,7 +199,7 @@ class VideoPlayerActivity : FragmentActivity() {
                 ptitle = "$videoTitle-${episodeUrl.name}"
                 videoPlayer.setUp(purl, true, "$videoTitle-${episodeUrl.name}")
                 //--开始播放前关闭硬件加速
-                //GSPlayerSystem.setEnableHardwareAcceleration(false)
+                GSPlayerSystem.setEnableHardwareAcceleration(true)
                 videoPlayer.startPlayLogic()
             }
         }
@@ -298,7 +304,10 @@ class VideoPlayerActivity : FragmentActivity() {
                         GSPlayerSystem.setPlayHx(playhx)
                         //--切换内核完成后重置播放器
                         var seekTo = videoPlayer.getCurrentPositionWhenPlaying()
-                        GSYVideoManager.releaseAllVideos()
+                        videoPlayer.release()
+                        GSPlayerSystem.clear(this) // 释放播放器所有缓存
+                        GSYVideoManager.releaseAllVideos()// 释放所有视频
+
                         videoPlayer.setUp(purl, true, ptitle)
                         videoPlayer.startPlayLogic()
                         videoPlayer.seekTo(seekTo)
@@ -319,7 +328,10 @@ class VideoPlayerActivity : FragmentActivity() {
                         GSPlayerSystem.setPlayHx(playhx)
                         //--切换内核完成后重置播放器
                         var seekTo = videoPlayer.getCurrentPositionWhenPlaying()
-                        GSYVideoManager.releaseAllVideos()
+                        videoPlayer.release()
+                        GSPlayerSystem.clear(this) // 释放播放器所有缓存
+                        GSYVideoManager.releaseAllVideos()// 释放所有视频
+
                         videoPlayer.setUp(purl, true, ptitle)
                         videoPlayer.startPlayLogic()
                         videoPlayer.seekTo(seekTo)

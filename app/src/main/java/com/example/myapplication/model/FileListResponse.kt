@@ -7,7 +7,7 @@ import kotlinx.serialization.Serializable
 data class FileListResponse(
     var kind: String,
     @SerialName("next_page_token") val nextPageToken: String,
-    var files: List<File>,
+    var files: MutableList<File>,
     val version: String,
     @SerialName("version_outdated") val versionOutdated: Boolean,
     @SerialName("sync_time") val syncTime: String
