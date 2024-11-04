@@ -11,6 +11,7 @@ import android.widget.FrameLayout
 import android.widget.ProgressBar
 import android.widget.TextView
 import android.widget.Toast
+import androidx.core.view.isVisible
 import androidx.fragment.app.FragmentActivity
 import androidx.leanback.widget.HorizontalGridView
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -313,13 +314,16 @@ class VideoPlayerActivity : FragmentActivity() {
                         GSPlayerSystem.setPlayHx(playhx)
                         //--切换内核完成后重置播放器
                         var seekTo = videoPlayer.getCurrentPositionWhenPlaying()
-                        videoPlayer.release()
-                        GSPlayerSystem.clear(this) // 释放播放器所有缓存
-                        GSYVideoManager.releaseAllVideos()// 释放所有视频
-
-                        videoPlayer.setUp(purl, true, ptitle)
+                        videoPlayer.setUp("", true, ptitle)
                         videoPlayer.startPlayLogic()
-                        videoPlayer.seekTo(seekTo)
+                        MainScope().launch {
+                            videoPlayer.setUp(purl, true, ptitle)
+                            GSPlayerSystem.setEnableHardwareAcceleration(true)
+                            videoPlayer.startPlayLogic()
+                            MainScope().launch {
+                                videoPlayer.seekTo(seekTo)
+                            }
+                        }
                         Toast.makeText(this, "已切换${playhx + 1}号内核!", Toast.LENGTH_SHORT)
                             .show()
                     } else
@@ -337,13 +341,16 @@ class VideoPlayerActivity : FragmentActivity() {
                         GSPlayerSystem.setPlayHx(playhx)
                         //--切换内核完成后重置播放器
                         var seekTo = videoPlayer.getCurrentPositionWhenPlaying()
-                        videoPlayer.release()
-                        GSPlayerSystem.clear(this) // 释放播放器所有缓存
-                        GSYVideoManager.releaseAllVideos()// 释放所有视频
-
-                        videoPlayer.setUp(purl, true, ptitle)
+                        videoPlayer.setUp("", true, ptitle)
                         videoPlayer.startPlayLogic()
-                        videoPlayer.seekTo(seekTo)
+                        MainScope().launch {
+                            videoPlayer.setUp(purl, true, ptitle)
+                            GSPlayerSystem.setEnableHardwareAcceleration(true)
+                            videoPlayer.startPlayLogic()
+                            MainScope().launch {
+                                videoPlayer.seekTo(seekTo)
+                            }
+                        }
                         Toast.makeText(this, "已切换${playhx + 1}号内核!", Toast.LENGTH_SHORT)
                             .show()
                     } else
