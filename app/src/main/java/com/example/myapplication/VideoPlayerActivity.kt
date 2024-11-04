@@ -4,6 +4,8 @@ import android.content.Context
 import android.content.Intent
 import android.graphics.Color
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.view.Gravity
 import android.view.KeyEvent
 import android.view.View
@@ -11,7 +13,6 @@ import android.widget.FrameLayout
 import android.widget.ProgressBar
 import android.widget.TextView
 import android.widget.Toast
-import androidx.core.view.isVisible
 import androidx.fragment.app.FragmentActivity
 import androidx.leanback.widget.HorizontalGridView
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -28,6 +29,7 @@ import com.shuyu.gsyvideoplayer.video.base.GSYVideoView
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.launch
 
+
 class VideoPlayerActivity : FragmentActivity() {
 
     private lateinit var videoPlayer: StandardGSYVideoPlayer
@@ -38,6 +40,7 @@ class VideoPlayerActivity : FragmentActivity() {
     private var playhx = 2 //播放内核
     private var purl = "" //当前播放的url
     private var ptitle = "" //当前播放的标题
+    var handler: Handler = Handler(Looper.getMainLooper())//延时任务
 
     // 用于处理长按手势
     private var isRewinding = false
@@ -313,18 +316,11 @@ class VideoPlayerActivity : FragmentActivity() {
                         playhx -= 1
                         GSPlayerSystem.setPlayHx(playhx)
                         //--切换内核完成后重置播放器
-                        var seekTo = videoPlayer.getCurrentPositionWhenPlaying()
-                        videoPlayer.setUp("", true, ptitle)
-                        videoPlayer.startPlayLogic()
-                        MainScope().launch {
-                            videoPlayer.setUp(purl, true, ptitle)
-                            GSPlayerSystem.setEnableHardwareAcceleration(true)
-                            videoPlayer.startPlayLogic()
-                            MainScope().launch {
-                                videoPlayer.seekTo(seekTo)
-                            }
-                        }
-                        Toast.makeText(this, "已切换${playhx + 1}号内核!", Toast.LENGTH_SHORT)
+//                        var seekTo = videoPlayer.getCurrentPositionWhenPlaying()
+//                        videoPlayer.seekTo(seekTo)
+//                        videoPlayer.setUp("", true, ptitle)
+//                        videoPlayer.setUp(purl, true, ptitle)
+                        Toast.makeText(this, "已切换${playhx + 1}号内核,重新播放后生效!", Toast.LENGTH_SHORT)
                             .show()
                     } else
                         Toast.makeText(
@@ -341,17 +337,8 @@ class VideoPlayerActivity : FragmentActivity() {
                         GSPlayerSystem.setPlayHx(playhx)
                         //--切换内核完成后重置播放器
                         var seekTo = videoPlayer.getCurrentPositionWhenPlaying()
-                        videoPlayer.setUp("", true, ptitle)
-                        videoPlayer.startPlayLogic()
-                        MainScope().launch {
-                            videoPlayer.setUp(purl, true, ptitle)
-                            GSPlayerSystem.setEnableHardwareAcceleration(true)
-                            videoPlayer.startPlayLogic()
-                            MainScope().launch {
-                                videoPlayer.seekTo(seekTo)
-                            }
-                        }
-                        Toast.makeText(this, "已切换${playhx + 1}号内核!", Toast.LENGTH_SHORT)
+                        videoPlayer.seekTo(seekTo)
+                        Toast.makeText(this, "已切换${playhx + 1}号内核,重新播放后生效!", Toast.LENGTH_SHORT)
                             .show()
                     } else
                         Toast.makeText(
