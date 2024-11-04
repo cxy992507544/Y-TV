@@ -104,20 +104,27 @@ class VideoPlayerActivity : FragmentActivity() {
                             vdlist = d3!!
                             //--对列表进行排序
                             vdlist.files.sortBy { it.name }
-                            //--干掉那些过于小的文件
-                            val mutableFiles = vdlist.files
+                            // 定义文件大小阈值
+                            val MIN_FILE_SIZE = 1024 * 1024 * 50L
                             // 移除过小的文件
-                            for (i in mutableFiles.indices.reversed()) {
-                                if (mutableFiles[i].size.toInt() < 1024 * 1024 * 50) {
-                                    mutableFiles.removeAt(i)
-                                }
-                            }
-                            // 更新 vdlist.files
-                            vdlist.files = mutableFiles
+                            vdlist.files.removeAll { it.size.toLong() < MIN_FILE_SIZE }
                             //5.获取第一项视频的画质列表
                             val d4 = d3?.files?.get(0)?.let { it1 -> chen.Getfileplay(it1.id) }
-                            //6.添加画质列表
-                            d4?.forEach { vmlist.add(it) }
+                            if(d4 == null){
+                                //--进入此处说明没有文件夹 就是文件列表
+                                //5.获取第一项视频的画质列表
+                                val d4r = d2?.tasks?.get(0)?.let { it1 -> chen.Getfileplay(it1.fileId) }
+                                //--清除掉播放地址为空对象
+                                d4r?.removeAll { it.url.isNullOrEmpty() }
+                                //6.添加画质列表
+                                d4r?.forEach { vmlist.add(it) }
+                            }
+                            else{
+                                //--清除掉播放地址为空对象
+                                d4.removeAll { it.url.isNullOrEmpty() }
+                                //6.添加画质列表
+                                d4?.forEach { vmlist.add(it) }
+                            }
                         } else {
                             vdlist = d3!!
                             //--进入此处说明没有文件夹 就是文件列表
@@ -172,7 +179,7 @@ class VideoPlayerActivity : FragmentActivity() {
                 }
 
             } catch (e: Exception) {
-                Toast.makeText(this@VideoPlayerActivity, "加载出错，请稍后重试", Toast.LENGTH_SHORT)
+                Toast.makeText(this@VideoPlayerActivity, e.message, Toast.LENGTH_SHORT)
                     .show()
                 finish()
             } finally {
@@ -194,6 +201,8 @@ class VideoPlayerActivity : FragmentActivity() {
                 GSYVideoManager.releaseAllVideos()//先释放所有
                 //1.获取视频的画质列表
                 val d4 = chen.Getfileplay(episodeUrl.id)
+                //--清除掉播放地址为空对象
+                d4?.removeAll { it.url.isNullOrEmpty() }
                 //2.默认播放最高画质的一项 也就是第一项
                 purl = d4?.get(0)?.url.toString()
                 ptitle = "$videoTitle-${episodeUrl.name}"

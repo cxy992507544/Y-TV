@@ -3,6 +3,6 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class VideoQuality(
-    val name: String,
-    val url: String
+    val name: String? = "",
+    val url: String? = ""
 )

@@ -15,6 +15,7 @@ import kotlinx.serialization.json.Json
 class ChenApi {
     private val json = Json {
         ignoreUnknownKeys = true
+        coerceInputValues = true
     }
     val networkClient = OkHttp()
     //获取热门的影视 指定类型
@@ -112,11 +113,11 @@ class ChenApi {
         }
     }
     //获取指定文件的播放列表
-    suspend fun Getfileplay(fid: String): List<VideoQuality>? {
+    suspend fun Getfileplay(fid: String): MutableList<VideoQuality>? {
         val response = networkClient.get("http://110.41.14.10:8105/getfileplay/${fid}")
         return response?.let {
             try {
-                json.decodeFromString<List<VideoQuality>>(it)
+                json.decodeFromString<MutableList<VideoQuality>>(it)
             } catch (e: Exception) {
                 println("JSON parsing error: ${e.message}")
                 null
