@@ -125,5 +125,17 @@ class ChenApi {
         }
     }
 
+    //获取新的图片
+    suspend fun GetNewImg(): String? {
+        val response = networkClient.get("https://api.vvhan.com/api/wallpaper/acg")
+        return response?.let {
+            try {
+                return ""
+            } catch (e: Exception) {
+                return "https://i0.wp.com/api-storage.4ce.cn/v1/5e2b26ed1d14d895655dc4bbb820dc7d.webp"
+            }
+        }
+    }
+
 }
 

@@ -4,6 +4,7 @@
     android:backgroundTint="#303030"
     android:textColor="#FFFFFF"
     android:padding="8dp"
+    android:layout_margin="4dp"
     android:ellipsize="marquee"
     android:singleLine="true"
     android:maxLines="1"

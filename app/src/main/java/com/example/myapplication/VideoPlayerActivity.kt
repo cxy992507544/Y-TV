@@ -3,6 +3,7 @@ package com.example.myapplication
 import android.content.Context
 import android.content.Intent
 import android.graphics.Color
+import android.graphics.drawable.Drawable
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
@@ -16,6 +17,10 @@ import android.widget.Toast
 import androidx.fragment.app.FragmentActivity
 import androidx.leanback.widget.HorizontalGridView
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.bumptech.glide.Glide
+import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
+import com.bumptech.glide.request.target.CustomTarget
+import com.bumptech.glide.request.transition.Transition
 import com.example.myapplication.R.*
 import com.example.myapplication.model.File
 import com.example.myapplication.model.FileListResponse
@@ -51,6 +56,30 @@ class VideoPlayerActivity : FragmentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(layout.activity_video_player)
+
+
+        // 设置一个默认背景，避免初次加载的空白
+        val frameLayout = findViewById<FrameLayout>(R.id.mainLayout)
+        frameLayout.setBackgroundResource(R.drawable.default_background) // 替换为合适的默认背景
+
+        // 生成一个 guid
+        val guid = "guid_" + System.currentTimeMillis()
+        val imageUrl = "https://api.suyanw.cn/api/comic?v=$guid"
+
+        // 使用 Glide 加载新图片，并添加淡入效果
+        Glide.with(this)
+            .load(imageUrl)
+            .transition(DrawableTransitionOptions.withCrossFade()) // 添加淡入效果
+            .into(object : CustomTarget<Drawable>() {
+                override fun onResourceReady(resource: Drawable, transition: Transition<in Drawable>?) {
+                    // 加载完成后设置新背景
+                    frameLayout.background = resource
+                }
+
+                override fun onLoadCleared(placeholder: Drawable?) {
+                    // 加载被清除或失败时保留当前背景
+                }
+            })
 
         videoPlayer = findViewById(id.videoPlayer)
 
@@ -335,9 +364,6 @@ class VideoPlayerActivity : FragmentActivity() {
                     if (playhx < 3) {
                         playhx += 1
                         GSPlayerSystem.setPlayHx(playhx)
-                        //--切换内核完成后重置播放器
-                        var seekTo = videoPlayer.getCurrentPositionWhenPlaying()
-                        videoPlayer.seekTo(seekTo)
                         Toast.makeText(this, "已切换${playhx + 1}号内核,重新播放后生效!", Toast.LENGTH_SHORT)
                             .show()
                     } else
