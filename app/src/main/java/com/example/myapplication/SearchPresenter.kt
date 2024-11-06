@@ -17,6 +17,7 @@ import com.example.myapplication.diy.CustomEditText
 import com.example.myapplication.model.Item
 import com.example.myapplication.model.Subject
 import com.example.myapplication.network.ChenApi
+import com.example.myapplication.tool.Select
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.launch
 
@@ -41,29 +42,21 @@ class SearchPresenter(private val fragment: MainFragment) : Presenter() {
         searchButton = viewHolder.view.findViewById(R.id.searchButton)
         loadingSpinner = viewHolder.view.findViewById(R.id.loadingSpinner)
 
-        testButton.visibility = View.GONE // 隐藏跳转按钮
+//        testButton.visibility = View.GONE // 隐藏跳转按钮
 
-        searchEditText.isFocusable = true
-        searchEditText.isFocusableInTouchMode = true
-        // 按钮可获取焦点
-        rsButton.isFocusable = true
-        rsButton.isFocusableInTouchMode = true
-        restButton.isFocusable = true
-        restButton.isFocusableInTouchMode = true
-        searchButton.isFocusable = true
-        searchButton.isFocusableInTouchMode = true
-        testButton.isFocusable = true
-        testButton.isFocusableInTouchMode = true
+//        searchEditText.isFocusable = true
+//        searchEditText.isFocusableInTouchMode = true
 
-        // 焦点变化监听
-        rsButton.setOnFocusChangeListener { v, hasFocus -> handleFocus(v, hasFocus) }
-        restButton.setOnFocusChangeListener { v, hasFocus -> handleFocus(v, hasFocus) }
-        searchButton.setOnFocusChangeListener { v, hasFocus -> handleFocus(v, hasFocus) }
-        testButton.setOnFocusChangeListener { v, hasFocus -> handleFocus(v, hasFocus) }
+
+        Select.setFocusChange(restButton)
+        Select.setFocusChange(testButton)
+        Select.setFocusChange(rsButton)
+        Select.setFocusChange(searchButton)
+        Select.setFocusChange(searchEditText)
 
 
 
-        // 输入框失去焦点时提示
+        // 输入框失去焦点时操作
         searchEditText.setOnFocusChangeListener { _, hasFocus ->
             if (!hasFocus && searchEditText.text.isBlank()) {
                 clearSearchBox()
@@ -78,8 +71,8 @@ class SearchPresenter(private val fragment: MainFragment) : Presenter() {
         // 跳转按钮点击事件
         testButton.setOnClickListener {
             val context = viewHolder.view.context
-            val videoUrl = "/tdown/744503030.html"
-            val videoTitle = "斗破苍穹"
+            val videoUrl = "/tdown/18576742.html"
+            val videoTitle = "夏目友人帐"
             VideoPlayerActivity.start(
                 context = context,
                 videoUrl = videoUrl,
@@ -98,19 +91,6 @@ class SearchPresenter(private val fragment: MainFragment) : Presenter() {
         searchButton.setOnClickListener { performSearch() }
     }
 
-    private fun handleFocus(view: View, hasFocus: Boolean) {
-        if (hasFocus) {
-            view.scaleX = 1.1f
-            view.scaleY = 1.1f
-            backgg = view.background
-            view.setBackgroundColor(Color.argb(100,75,164,164))
-        } else {
-            view.scaleX = 1f
-            view.scaleY = 1f
-//            view.setBackgroundColor(Color.LTGRAY)
-            view.background = backgg
-        }
-    }
 
     private fun performSearch() {
         searchButton.requestFocus()

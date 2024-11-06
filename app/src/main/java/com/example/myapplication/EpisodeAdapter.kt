@@ -12,6 +12,7 @@ import android.widget.TextView
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
 import com.example.myapplication.model.File
+import com.example.myapplication.tool.Select
 
 class EpisodeAdapter(
     private val onEpisodeClick: (File) -> Unit
@@ -61,18 +62,25 @@ class EpisodeAdapter(
             itemView.isFocusable = true // 确保项可聚焦
             itemView.isFocusableInTouchMode = true
 
+            Select.setFocusChange(episodeTextView)
+
             // 设置项获得焦点时的边框样式和放大效果
             itemView.setOnFocusChangeListener { view, hasFocus ->
                 if (hasFocus) {
                     view.scaleX = 1.1f
                     view.scaleY = 1.1f
+                    view.isSelected = true // 开始滚动
+                    view.requestFocus() // 确保按钮获得焦点
                     view.background = ContextCompat.getDrawable(view.context, R.drawable.newborder)
                 } else {
                     view.scaleX = 1.0f
                     view.scaleY = 1.0f
+                    view.isSelected = false // 停止滚动
+                    view.clearAnimation() // 清除动画
                     view.background = null
                 }
             }
+
         }
 
         fun bind(episode: File, isSelected: Boolean) {
@@ -90,13 +98,9 @@ class EpisodeAdapter(
             if (isSelected) {
                 itemView.setBackgroundColor(ContextCompat.getColor(itemView.context, R.color.selected_background))
                 episodeTextView.setTextColor(ContextCompat.getColor(itemView.context, R.color.selected_text))
-//                itemView.setBackgroundColor(android.graphics.Color.argb(100,75,164,164))
-//                episodeTextView.setTextColor(android.graphics.Color.rgb(255,138,0))
             } else {
                 itemView.setBackgroundColor(ContextCompat.getColor(itemView.context, R.color.default_background))
                 episodeTextView.setTextColor(ContextCompat.getColor(itemView.context, R.color.default_text))
-//                episodeTextView.background = backgg
-//                episodeTextView.setTextColor(android.graphics.Color.rgb(0,0,0))
             }
         }
 

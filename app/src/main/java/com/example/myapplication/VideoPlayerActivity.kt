@@ -58,28 +58,28 @@ class VideoPlayerActivity : FragmentActivity() {
         setContentView(layout.activity_video_player)
 
 
-        // 设置一个默认背景，避免初次加载的空白
-        val frameLayout = findViewById<FrameLayout>(R.id.mainLayout)
-        frameLayout.setBackgroundResource(R.drawable.default_background) // 替换为合适的默认背景
-
-        // 生成一个 guid
-        val guid = "guid_" + System.currentTimeMillis()
-        val imageUrl = "https://api.suyanw.cn/api/comic?v=$guid"
-
-        // 使用 Glide 加载新图片，并添加淡入效果
-        Glide.with(this)
-            .load(imageUrl)
-            .transition(DrawableTransitionOptions.withCrossFade()) // 添加淡入效果
-            .into(object : CustomTarget<Drawable>() {
-                override fun onResourceReady(resource: Drawable, transition: Transition<in Drawable>?) {
-                    // 加载完成后设置新背景
-                    frameLayout.background = resource
-                }
-
-                override fun onLoadCleared(placeholder: Drawable?) {
-                    // 加载被清除或失败时保留当前背景
-                }
-            })
+//        // 设置一个默认背景，避免初次加载的空白
+//        val frameLayout = findViewById<FrameLayout>(R.id.mainLayout)
+//        frameLayout.setBackgroundResource(R.drawable.default_background) // 替换为合适的默认背景
+//
+//        // 生成一个 guid
+//        val guid = "guid_" + System.currentTimeMillis()
+//        val imageUrl = "https://api.suyanw.cn/api/comic?v=$guid"
+//
+//        // 使用 Glide 加载新图片，并添加淡入效果
+//        Glide.with(this)
+//            .load(imageUrl)
+//            .transition(DrawableTransitionOptions.withCrossFade()) // 添加淡入效果
+//            .into(object : CustomTarget<Drawable>() {
+//                override fun onResourceReady(resource: Drawable, transition: Transition<in Drawable>?) {
+//                    // 加载完成后设置新背景
+//                    frameLayout.background = resource
+//                }
+//
+//                override fun onLoadCleared(placeholder: Drawable?) {
+//                    // 加载被清除或失败时保留当前背景
+//                }
+//            })
 
         videoPlayer = findViewById(id.videoPlayer)
 
