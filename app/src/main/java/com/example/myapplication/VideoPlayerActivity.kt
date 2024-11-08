@@ -39,7 +39,7 @@ class VideoPlayerActivity : FragmentActivity() {
 
     private lateinit var videoPlayer: StandardGSYVideoPlayer
     private lateinit var episodeGridView: HorizontalGridView
-    private lateinit var vdlist: FileListResponse
+    private lateinit var vdlist: MutableList<File>
     private lateinit var progressBar: ProgressBar
     private val chen = ChenApi()
     private var playhx = 2 //播放内核
@@ -117,64 +117,29 @@ class VideoPlayerActivity : FragmentActivity() {
                 val vmlist: MutableList<VideoQuality> = mutableListOf()
 
                 if (mg != null && mg.url.isNotEmpty()) {
-                    //2.添加云任务
-                    val d1 = chen.Getupuri(mg.url)
-                    //3.等待云任务完成
-                    var d2 = d1?.task?.let { it1 -> chen.Getfilestr(it1.id) }
-                    val maxRetries = 30 // 最大重试次数
-                    (1..maxRetries).forEach { _ ->
-                        if (d2?.tasks?.get(0)?.message == "已存到云盘") {
-                            return@forEach
-                        }
-                        Thread.sleep(1000) //睡着一秒
-                        d2 = d1?.task?.let { it1 -> chen.Getfilestr(it1.id) }
-                    }
+                    //2.添加云任务并获取列表
+                    val d1 = chen.Getmglist(mg.url)
+                    vdlist = d1!!
+                    //--对列表进行排序
+                    vdlist.sortBy { it.name }
+                    // 定义文件大小阈值
+                    val MIN_FILE_SIZE = 1024 * 1024 * 50L
+                    // 移除过小的文件
+                    vdlist.removeAll { it.size.toLong() < MIN_FILE_SIZE }
+                    //3.获取第一项视频的画质列表
+                    val d4 = d1?.get(0)?.let { it1 -> chen.Getfileplay(it1.id) }
+                    //--清除掉播放地址为空对象
+                    d4?.removeAll { it.url.isNullOrEmpty() }
+                    //6.添加画质列表
+                    d4?.forEach { vmlist.add(it) }
 
-                    if (d2?.tasks?.get(0)?.message == "已存到云盘") {
-                        //4.获取文件夹内容
-                        val d3 = d2?.tasks?.get(0)?.let { it1 -> chen.Getfiles(it1.fileId) }
-                        if (d3?.files?.count()!! > 0) {
-                            vdlist = d3!!
-                            //--对列表进行排序
-                            vdlist.files.sortBy { it.name }
-                            // 定义文件大小阈值
-                            val MIN_FILE_SIZE = 1024 * 1024 * 50L
-                            // 移除过小的文件
-                            vdlist.files.removeAll { it.size.toLong() < MIN_FILE_SIZE }
-                            //5.获取第一项视频的画质列表
-                            val d4 = d3?.files?.get(0)?.let { it1 -> chen.Getfileplay(it1.id) }
-                            if(d4 == null){
-                                //--进入此处说明没有文件夹 就是文件列表
-                                //5.获取第一项视频的画质列表
-                                val d4r = d2?.tasks?.get(0)?.let { it1 -> chen.Getfileplay(it1.fileId) }
-                                //--清除掉播放地址为空对象
-                                d4r?.removeAll { it.url.isNullOrEmpty() }
-                                //6.添加画质列表
-                                d4r?.forEach { vmlist.add(it) }
-                            }
-                            else{
-                                //--清除掉播放地址为空对象
-                                d4.removeAll { it.url.isNullOrEmpty() }
-                                //6.添加画质列表
-                                d4?.forEach { vmlist.add(it) }
-                            }
-                        } else {
-                            vdlist = d3!!
-                            //--进入此处说明没有文件夹 就是文件列表
-                            vdlist.kind = d2?.tasks?.get(0)?.fileId.toString()//文件ID
-                            //5.获取第一项视频的画质列表
-                            val d4 = d2?.tasks?.get(0)?.let { it1 -> chen.Getfileplay(it1.fileId) }
-                            //6.添加画质列表
-                            d4?.forEach { vmlist.add(it) }
-                        }
-                    }
+
                 }
-
                 //继续实例化播放器等操作
-                if (vdlist.files.isNotEmpty()) {
+                if (vdlist.isNotEmpty()) {
                     purl = vmlist[0].url.toString()
-                    ptitle = "$videoTitle-${vdlist.files[0].name}"
-                    videoPlayer.setUp(purl, true, "$videoTitle-${vdlist.files[0].name}")
+                    ptitle = "$videoTitle-${vdlist[0].name}"
+                    videoPlayer.setUp(purl, true, "$videoTitle-${vdlist[0].name}")
                     videoPlayer.titleTextView.visibility = View.GONE
                     videoPlayer.backButton.visibility = View.GONE
                     videoPlayer.fullscreenButton.visibility = View.GONE
@@ -253,13 +218,14 @@ class VideoPlayerActivity : FragmentActivity() {
         }
 
         // 绑定数据
-        if (vdlist.files.isNotEmpty()) {
-            episodeAdapter.submitList(vdlist.files)
-        } else {
-            //--生成唯一的文件播放
-            val videoFile = File(id = vdlist.kind, name = "正片")
-            episodeAdapter.submitList(listOf(videoFile))
+        if (vdlist.isNotEmpty()) {
+            episodeAdapter.submitList(vdlist)
         }
+//        else {
+//            //--生成唯一的文件播放
+//            val videoFile = File(id = vdlist.kind, name = "正片")
+//            episodeAdapter.submitList(listOf(videoFile))
+//        }
     }
 
     private fun displayShowInfo() {

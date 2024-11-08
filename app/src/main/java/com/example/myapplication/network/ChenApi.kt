@@ -1,6 +1,7 @@
 package com.example.myapplication.network
 
 import com.example.myapplication.model.Douban
+import com.example.myapplication.model.File
 import com.example.myapplication.model.FileListResponse
 import com.example.myapplication.model.Item
 import com.example.myapplication.model.MediaSource
@@ -82,6 +83,19 @@ class ChenApi {
         return response?.let {
             try {
                 json.decodeFromString<Xl>(it)
+            } catch (e: Exception) {
+                println("JSON parsing error: ${e.message}")
+                null
+            }
+        }
+    }
+    //将任务添加到迅雷引擎并获取其返回值
+    suspend fun Getmglist(mg: String): MutableList<File>? {
+        val mgurl = mg.replace("magnet:?xt=urn:btih:","")
+        val response = networkClient.get("http://110.41.14.10:8105/getmglist/${mgurl}")
+        return response?.let {
+            try {
+                json.decodeFromString<MutableList<File>>(it)
             } catch (e: Exception) {
                 println("JSON parsing error: ${e.message}")
                 null
